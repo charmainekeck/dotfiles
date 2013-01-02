@@ -98,7 +98,7 @@
 
 ;; install new packages and init already installed packages
 (el-get 'sync my-packages)
-;
+
 ;; ================================= Visual =================================
 (setq inhibit-splash-screen t)               ; no splash screen, thanks
 
@@ -121,7 +121,7 @@
   (setq mac-allow-anti-aliasing t))
 
 (global-hl-line-mode 1)                      ; highlight current line
-;(global-linum-mode -1)                        ; add line numbers on the left
+(global-linum-mode 1)                       ; add line numbers on the left
 ;; vertical seperator between line numbers and content
 (defadvice linum-update-window (around linum-dynamic activate)
   (let* ((w (length (number-to-string
@@ -197,7 +197,6 @@
 ;;
 ;; The default way to toggle between them is C-c C-j and C-c C-k, let's
 ;; better use just one key to do the same.
-;(require 'term)
 (eval-after-load "term"
 '(progn
   (define-key term-raw-map  (kbd "C-'") 'term-line-mode)
@@ -228,7 +227,7 @@
 
 
 ;; ================================== Hooks ===================================
-;;; When saving files, set execute permission if #! is in first line.
+;; When saving files, set execute permission if #! is in first line.
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
 ;; Spell checking
@@ -253,3 +252,4 @@
                                  (- (+ hi lo)
                                     (+ (first *emacs-load-start*)
                                        (second *emacs-load-start*)))))
+
