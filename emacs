@@ -107,7 +107,7 @@
 
 ;; emacs 24 themes
 (when (string= (substring emacs-version 0 3) "24.")
-      (load-theme 'tango t))
+      (load-theme 'wombat t))
 ;; Show colors in shell mode
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 ;; Region Highlighting
