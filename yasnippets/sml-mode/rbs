@@ -1,0 +1,8 @@
+# contributor: Adam Walz
+# name: Red Black Set
+# key: rbs
+# --
+structure ${1:Set} = RedBlackSetFn (struct
+                                           type ord_key = $2
+									 val compare = $3
+                                    end)

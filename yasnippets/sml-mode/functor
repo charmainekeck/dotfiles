@@ -1,0 +1,8 @@
+# contributor: Adam Walz
+# name: Base Functor
+# key: functor
+# --
+functor $1($2) : $3 =
+struct
+	$4
+end

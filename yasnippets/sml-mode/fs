@@ -1,0 +1,8 @@
+# contributor: Adam Walz
+# name: Base Function Signature
+# key: fs
+# --
+funsig $1 ($2) =
+sig
+	$3
+end

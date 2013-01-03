@@ -1,0 +1,8 @@
+# contributor: Adam Walz
+# name: Base Structure
+# key: struct
+# --
+structure $1 =
+struct
+	$2
+end

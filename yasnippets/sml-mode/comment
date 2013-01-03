@@ -1,0 +1,5 @@
+# contributor: Adam Walz
+# name: standard ml commment
+# key: comment
+# --
+{* ${1:comment} *}

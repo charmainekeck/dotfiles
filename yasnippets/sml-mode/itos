@@ -1,0 +1,5 @@
+# contributor: Adam Walz
+# name: Int to String
+# key: itos
+# --
+Int.toString $1

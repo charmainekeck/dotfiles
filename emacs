@@ -58,7 +58,10 @@
   (loop for p in '(psvn                      ; M-x svn-status
                    (:name yasnippet          ; powerful snippet mode
                           :after (progn
-                                   (yas-global-mode 1)))
+                                   (yas-global-mode 1)
+				   (setq yas-snippet-dirs
+					 '("~/.yasnippets"   ; personal snippets
+				   ))))
                    ) do (add-to-list 'el-get-sources p)))
 
 (when (el-get-executable-find "bzr")

@@ -1,0 +1,8 @@
+# contributor: Adam Walz
+# name: Red Black Map
+# key: rbm
+# --
+structure ${1:Map} = RedBlackMapFn(struct
+                                          type ord_key = $2
+                                          val compare = $3
+                                    end)

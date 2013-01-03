@@ -1,0 +1,8 @@
+# contributor: Adam Walz
+# name: Base Signature
+# key: sig
+# --
+signature $1 =
+sig
+	$2
+end
