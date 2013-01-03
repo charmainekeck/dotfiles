@@ -59,9 +59,8 @@
                    (:name yasnippet          ; powerful snippet mode
                           :after (progn
                                    (yas-global-mode 1)
-				   (setq yas-snippet-dirs
-					 '("~/.yasnippets"   ; personal snippets
-				   ))))
+                                   (setq yas-snippet-dirs
+                                     '("~/.yasnippets")))) ; personal snippets
                    ) do (add-to-list 'el-get-sources p)))
 
 (when (el-get-executable-find "bzr")
@@ -102,12 +101,17 @@
 ;; install new packages and init already installed packages
 (el-get 'sync my-packages)
 
+
 ;; ================================= Visual =================================
 (setq inhibit-splash-screen t)               ; no splash screen, thanks
 
 ;; emacs 24 themes
 (when (string= (substring emacs-version 0 3) "24.")
       (load-theme 'wombat t))
+;; aquamacs themes
+(when (featurep 'aquamacs)
+  (color-theme-charcoal-black))
+
 ;; Show colors in shell mode
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 ;; Region Highlighting
@@ -137,6 +141,7 @@
 ;; shell, consider M-x term instead.
 (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
 
 ;; ================================= Backups ==================================
 ;; Disable autosaving
@@ -185,7 +190,7 @@
 ;; under mac, have Command as Meta and keep Option for localized input
 (when (eq system-type 'darwin)
   (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'none))
+  (setq mac-option-modifier nil))
 
 ;; Use the clipboard so that copy/paste "works"
 (setq x-select-enable-clipboard t)
@@ -256,4 +261,3 @@
                                  (- (+ hi lo)
                                     (+ (first *emacs-load-start*)
                                        (second *emacs-load-start*)))))
-
