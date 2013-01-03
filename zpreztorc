@@ -44,7 +44,7 @@ zstyle ':prezto:load' pmodule \
   'perl' \
   'python' \
   'ruby' \
-  'z' \
+  'fasd' \
   'node' \
   'syntax-highlighting' \
   'history-substring-search' \
