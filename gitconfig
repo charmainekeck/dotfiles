@@ -1,0 +1,69 @@
+[alias]
+	addremove = !git add --all && git ls-files --deleted -z | xargs -0 git rm
+	switch = checkout
+	unadd = reset --mixed
+	uncommit = reset --soft
+	undo = reset --hard
+	unstage = reset
+[user]
+	name = Adam Walz
+	email = viperlight89@me.com
+[color]
+	ui = auto
+[format]
+	numbered = auto
+[core]
+	legacyheaders = false
+	excludesfile = ~/.gitignore
+	whitespace = trailing-space,space-before-tab
+	quotepath = false
+[apply]
+	whitespace = warn
+[repack]
+	usedeltabaseoffset = true
+[branch]
+	autosetupmerge = true
+[pager]
+	status = false
+[tig]
+	show-date = relative
+	author-width = 8
+	show-rev-graph = yes
+[advice]
+	pushNonFastForward = false
+	statusHints = false
+[push]
+	default = tracking
+[rerere]
+	enabled = true
+[diff]
+	tool = vimdiff
+	guitool = ksdiff
+	mnemonicprefix = true
+	renames = copies
+[difftool]
+	prompt = false
+[difftool "ksdiff"]
+	cmd = ksdiff-wrapper git \"$LOCAL\" \"$REMOTE\"
+[merge]
+	tool = fugitive
+[mergetool]
+	prompt = false
+[mergetool "vimdiff3"]
+	cmd = vim -f -d -c \"wincmd J\" -c \"wincmd =\" \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = false
+[mergetool "gvimdiff3"]
+	cmd = gvim -f -d -c \"wincmd J\" -c \"wincmd =\" \"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+	trustExitCode = false
+[mergetool "fugitive"]
+	cmd = vim -f -c \"Gdiff\" \"$MERGED\" -c \"wincmd =\"
+	trustExitCode = false
+[mergetool "gfugitive"]
+	cmd = gvim -f-c \"Gdiff\" \"$MERGED\" -c \"wincmd =\"
+	trustExitCode = false
+[mergetool "splice"]
+	cmd = vim -f -c \"SpliceInit\" \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+	trustExitCode = true
+[mergetool "gsplice"]
+	cmd = gvim -f -c \"SpliceInit\" \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+	trustExitCode = true
