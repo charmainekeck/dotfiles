@@ -93,7 +93,7 @@
       zencoding-mode                          ; emacswiki.org/emacs/ZenCoding
       color-theme                             ; nice looking emacsn
       color-theme-tango                       ; check out color-theme-solarized
-      quack                                   ; support for scheme editing
+      ;quack                                   ; support for scheme editing
       scala-mode                              ; scala editing 
       sml-mode)                               ; standard ml editing      
       (mapcar 'el-get-source-name el-get-sources)))
