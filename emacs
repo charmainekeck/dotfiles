@@ -127,8 +127,8 @@
 (line-number-mode 1)                         ; have line numbers and
 (column-number-mode 1)                       ; column numbers in the mode line
 
-(tool-bar-mode -1)
 (when (window-system)
+  (tool-bar-mode -1)
   (scroll-bar-mode -1))
 (menu-bar-mode -1)
 (when (eq system-type 'darwin)
