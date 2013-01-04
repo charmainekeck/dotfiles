@@ -194,6 +194,10 @@
 (global-set-key "\C-c\C-z" 'gdb)
 (global-set-key "\C-c\C-k" 'shell)
 
+;; stop asking me for confirmation
+(global-set-key "\C-xk" 'kill-this-buffer)
+(setq vc-follow-symlinks nil)
+
 ;; under mac, have Command as Meta and keep Option for localized input
 (when (and
        (eq system-type 'darwin)
