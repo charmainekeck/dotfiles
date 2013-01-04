@@ -110,7 +110,14 @@
       (load-theme 'wombat t))
 ;; aquamacs themes
 (when (featurep 'aquamacs)
-  (color-theme-charcoal-black))
+  (color-theme-charcoal-black)
+  (one-buffer-one-frame-mode 0)
+  (defun my-new-frame-with-new-scratch ()
+    (interactive)
+    (let ((one-buffer-one-frame t))
+      (new-frame-with-new-scratch)))
+  (define-key osx-key-mode-map (kbd "A-n") 'my-new-frame-with-new-scratch)  
+  (define-key osx-key-mode-map (kbd "A-w") 'kill-this-buffer))
 
 ;; Show colors in shell mode
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -188,9 +195,11 @@
 (global-set-key "\C-c\C-k" 'shell)
 
 ;; under mac, have Command as Meta and keep Option for localized input
-(when (eq system-type 'darwin)
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier nil))
+(when (and
+       (eq system-type 'darwin)
+       (not (featurep 'aquamacs)))
+         (setq mac-command-modifier 'meta)
+         (setq mac-option-modifier nil))
 
 ;; Use the clipboard so that copy/paste "works"
 (setq x-select-enable-clipboard t)
