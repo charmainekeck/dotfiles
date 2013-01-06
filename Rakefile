@@ -322,6 +322,7 @@ task :render do
           File.open(target, 'w') do |file|
             info "Writing: #{target}"
             file.write source_contents
+	    file.chmod 0600
           end
         end
       rescue IOError
