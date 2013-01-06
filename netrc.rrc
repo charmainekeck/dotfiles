@@ -1,0 +1,3 @@
+machine jdios.jdchs.org
+login <%= Keychain['juandiego'].account %>
+password <%= Keychain['juandiego'].password %>
