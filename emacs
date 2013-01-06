@@ -263,6 +263,13 @@
                                 (local-set-key "\C-cp"            'semantic-analyze-proto-impl-toggle)
                                 (local-set-key "\C-xp"            'semantic-complete-analyze-inline-idle)))
 
+;; Map C-x k to end emacsclient session
+(add-hook 'server-switch-hook
+            (lambda ()
+              (when (current-local-map)
+                (use-local-map (copy-keymap (current-local-map))))
+	      (when server-buffer-clients
+		(local-set-key (kbd "C-x k") 'server-edit))))
 
 ;; =========================== Miscelaneous ===================================
 ;; Dvorak Input Mode
