@@ -1,0 +1,7 @@
+# contributor: Adam Walz
+# name: syntax highlighting for source code
+# key: code
+# --
+{% highlight ${1:objectivec} %}
+    $2
+{% endhighlight %}

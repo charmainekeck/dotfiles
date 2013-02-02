@@ -1,0 +1,5 @@
+# contributor: Adam Walz
+# name: pre-formatting for source code
+# key: `
+# --
+\`$1\`
