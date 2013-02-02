@@ -63,26 +63,6 @@
                                      '("~/.yasnippets")))) ; personal snippets
                    ) do (add-to-list 'el-get-sources p)))
 
-(when (el-get-executable-find "bzr")
-  (loop for p in '(
-    (:name cedet
-     :description "CEDET is a Collection of Emacs Development Environment 
-                   Tools written with the end goal of creating an advanced
-                   development environment in Emacs."
-     :type bzr
-     :url "bzr://cedet.bzr.sourceforge.net/bzrroot/cedet/code/trunk"
-     :build `(("sh" "-c" "touch `find . -name Makefile`")
-              ("make" ,(format "EMACS=%s" (shell-quote-argument el-get-emacs)) "clean-all")
-              ("make" ,(format "EMACS=%s" (shell-quote-argument el-get-emacs))))
-     :features nil
-     :lazy nil
-     :post-init (unless (featurep 'cedet-devel-load)
-                  (load (expand-file-name "cedet-devel-load.el" pdir)))
-     :after (progn
-             (global-ede-mode 1)        ; Enable project management system
-             (semantic-load-enable-excessive-code-helpers) ; Enable prototype help and smart completion 
-             (global-srecode-minor-mode 1)))  ; Enable template insertion
-    ) do (add-to-list 'el-get-sources p)))
 (when (el-get-executable-find "hg")
   (loop for p in '(rope                      ; python refactoring library
                    ropemode                  ; rope wrapper
@@ -109,6 +89,24 @@
 ;; install new packages and init already installed packages
 (el-get 'sync my-packages)
 
+;; CEDET
+(load-file "~/.emacs.d/cedet/common/cedet.el")
+(require 'semantic-ia)
+(require 'semantic-gcc)
+
+(global-ede-mode 1)                           ; Enable project management system
+(semantic-load-enable-excessive-code-helpers) ; Enable prototype help and smart completion 
+(global-srecode-minor-mode 1)                 ; Enable template insertion
+  
+(add-hook 'c-mode-common-hook (lambda ()
+                                (local-set-key [(control return)] 'semantic-ia-complete-symbol)
+                                (local-set-key "\C-c?"            'semantic-ia-complete-symbol-menu)
+                                (local-set-key "\C-c>"            'semantic-complete-analyze-inline)
+                                (local-set-key "\C-cp"            'semantic-analyze-proto-impl-toggle)
+                                (local-set-key "\C-xp"            'semantic-complete-analyze-inline-idle)))
+(add-hook 'c-mode-common-hook (lambda ()
+                                (local-set-key "." 'semantic-complete-self-insert)
+                                (local-set-key ">" 'semantic-complete-self-insert)))
   
 ;; ECB
 (add-to-list 'load-path
