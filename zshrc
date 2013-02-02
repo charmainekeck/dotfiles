@@ -16,5 +16,5 @@ fi
 alias ssh=ssh-with-profile
 
 # Add CUDA directories to PATH
-export PATH=/Developer/NVIDIA/CUDA-5.0/bin:$PATH
-export DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-5.0/lib:$DYLD_LIBRARY_PATH
+#export PATH=/Developer/NVIDIA/CUDA-5.0/bin:$PATH
+#export DYLD_LIBRARY_PATH=/Developer/NVIDIA/CUDA-5.0/lib:$DYLD_LIBRARY_PATH
