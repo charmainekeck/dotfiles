@@ -1,14 +1,30 @@
-~$
-xcuserdata
-build
-Icon
-.fseventsd
-.VolumeIcon.icns
+# OS X
 .DS_Store
-*~.nib
-*.xcworkspace
-*.swp
-*.rej
+.Spotlight-V100
+.Trashes
+Icon
+
+# Xcode
+build/
 *.pbxuser
-*.orig
+!default.pbxuser
 *.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
+xcuserdata
+profile
+*.moved-aside
+DerivedData
+.idea/
+
+# Emacs
+~$
+
+# Sublime Text 2
+*.sublime-workspace
+*.sublime-project
