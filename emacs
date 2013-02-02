@@ -83,6 +83,11 @@
              (semantic-load-enable-excessive-code-helpers) ; Enable prototype help and smart completion 
              (global-srecode-minor-mode 1)))  ; Enable template insertion
     ) do (add-to-list 'el-get-sources p)))
+(when (el-get-executable-find "hg")
+  (loop for p in '(rope                      ; python refactoring library
+                   ropemode                  ; rope wrapper
+                   ropemacs                  ; rope emacs interface
+                   ) do (add-to-list 'el-get-sources p)))
 
 (setq my-packages
   (append
@@ -94,6 +99,8 @@
       color-theme                             ; nice looking emacsn
       color-theme-tango                       ; check out color-theme-solarized
       ;quack                                  ; support for scheme editing
+      pymacs                                  ; spawn python processes
+      ac-python                               ; autocompletion source python
       scala-mode                              ; scala editing 
       sml-mode                                ; standard ml editing
       flex-mode)                              ; lex/flex lexer-generator editing
@@ -102,6 +109,22 @@
 ;; install new packages and init already installed packages
 (el-get 'sync my-packages)
 
+  
+;; ECB
+(add-to-list 'load-path
+  "~/.emacs.d/ecb")
+(require `ecb)
+(setq ecb-version-check nil)  ; to prevent ecb failing to start up
+(defadvice ecb-check-requirements (around no-version-check activate compile)
+  (if (or (< emacs-major-version 23)
+          (and (= emacs-major-version 23)
+               (< emacs-minor-version 3)))
+      ad-do-it))
+        
+(setq stack-trace-on-error nil) ;;don’t popup Backtrace window
+(setq ecb-tip-of-the-day nil)
+(setq ecb-primary-secondary-mouse-buttons (quote mouse-2–-C-mouse-2))
+(setq ecb-source-path (quote (“~/”)))
 
 ;; ================================= Visual =================================
 (setq inhibit-splash-screen t)               ; no splash screen, thanks
