@@ -3,4 +3,4 @@
 	url = https://github.com/adamwalz/prezto.git
 [submodule "ssh"]
 	path = ssh
-	url = github:adamwalz/SSH.git
+	url = https://github.com/adamwalz/SSH.git
