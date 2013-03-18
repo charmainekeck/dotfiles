@@ -1,5 +1,6 @@
 #apple-gcc42
 heroku-toolbelt
+hub
 readline
 reattach-to-user-namespace
 zeromq
