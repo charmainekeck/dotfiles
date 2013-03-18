@@ -1,0 +1,5 @@
+#apple-gcc42
+heroku-toolbelt
+readline
+reattach-to-user-namespace
+zeromq
