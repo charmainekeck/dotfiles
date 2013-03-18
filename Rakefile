@@ -62,6 +62,7 @@ EXCLUDES = [
   '.git',
   '.gitignore',
   '.gitmodules',
+  'brew',
   'README.md',
   /.*~$/,
   /^\#.*\#$/,
@@ -164,6 +165,52 @@ end
 def exists?(command)
   ENV['PATH'].split(':').any? do |directory|
     File.exists?(File.join(directory, command))
+  end
+end
+
+namespace :homebrew do
+  desc "Installs homebrew"
+  task :install => [:brew_install, :formula_install]
+
+  desc "Updates package list and upgrades to latest version"
+  task :update => [:brew_update, :formula_install, :brew_upgrade]
+
+  task :brew_install do
+    if not exists? "brew"
+      info "Installing homebrew"
+      sh "ruby -e \"$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)\""
+      sh "brew doctor"
+    end
+  end
+  
+  task :brew_update => :brew_install do
+    sh "brew update"
+    sh "brew doctor"
+  end
+
+  task :brew_upgrade => :brew_update do
+    sh "brew upgrade"
+    sh "brew cleanup"
+  end
+
+  task :formula_install => :brew_update do
+    formula_list = []
+    FileList["brew/*"].each do |f|
+      file = File.new(f, "r")
+      while (line = file.gets)
+        # Don't installed commented or invalid lines
+        formula_list << line.chomp if not line =~ /^(#.*|\s*)/
+      end
+    end
+
+
+    # Remove packages that are already installed
+    installables = formula_list - %x[brew list].split(/\s/)
+    installables.each do |formula|
+      sh "brew install #{formula}" do |ok, res|
+        # install, but don't die if brew throws an error
+      end
+    end
   end
 end
 
@@ -395,6 +442,8 @@ end
 
 desc 'Install dot files'
 task :install => [
+  'homebrew:install',
+  'homebrew:update',
   'module:init',
   'render',
   'link:create',
