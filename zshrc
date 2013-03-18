@@ -10,17 +10,10 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Source Boxen
-[ -f /opt/boxen/env.sh ] && source /opt/boxen/env.sh
-
 #============================ Customize to your needs =========================
 
 # Changes iTerm profile when using ssh
 alias ssh=ssh-with-profile
-
-# Add GNU version of CoreUtils to path without 'g' prefix
-PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
-MANPATH="$(brew --prefix)/opt/coreutils/libexec/gnuman:$MANPATH"
 
 # Add CUDA directories to PATH
 #export PATH=/Developer/NVIDIA/CUDA-5.0/bin:$PATH
