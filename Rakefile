@@ -199,7 +199,7 @@ namespace :homebrew do
       file = File.new(f, "r")
       while (line = file.gets)
         # Don't installed commented or invalid lines
-        formula_list << line.chomp if not line =~ /^(#.*|\s*)/
+        formula_list << line.chomp if not line =~ /^(#.*|\s*$)/
       end
     end
 
