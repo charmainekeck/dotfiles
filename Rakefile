@@ -5,17 +5,6 @@
 #       VERSION:  1.0.0
 #------------------------------------------------------------------------------
 
-#------------------------------------- Resources ------------------------------
-# Refers to
-#          FILE:  Rakefile
-#   DESCRIPTION:  Sorin Ionescu's dot file installer
-#        AUTHOR:  Sorin Ionescu <sorin.ionescu@gmail.com>
-#          DATE:  1/2/2013
-#       VERSION:  2.1.5
-#  AVAILABILITY:  https://github.com/sorin-ionescu/dot-files/blob/master/Rakefile
-#------------------------------------------------------------------------------
-
-
 require 'date'
 require 'open3'
 require 'fileutils'
@@ -45,17 +34,24 @@ end
 
 RAW_FILE_EXTENSION = 'rrc'
 RAW_FILE_EXTENSION_REGEXP = /\.#{RAW_FILE_EXTENSION}$/
+
 KEYCHAIN_GENERIC_PASSWORD_COMMAND = 'security find-generic-password -gl'
 KEYCHAIN_INTERNET_PASSWORD_COMMAND = 'security find-internet-password -gl'
 ACCOUNT_REGEXP = /"acct"<blob>=(?:0x([0-9A-F]+)\s*)?(?:"(.*)")?$/
 PASSWORD_REGEXP = /^password: (?:0x([0-9A-F]+)\s*)?(?:"(.*)")?$/
+
 SCRIPT_PATH = File.split(File.expand_path(__FILE__))
 SCRIPT_NAME = SCRIPT_PATH.last
 CONFIG_DIR_PATH = SCRIPT_PATH.first
+
+SUBLIME_DIR_PATH = "#{CONFIG_DIR_PATH}/sublime"
+SUBLIME_PACKAGE_DIR = "#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages/User"
+
 BACKUP_DIR_PATH = File.join(
   ENV['HOME'],
   '.dotfiles_backup',
   DateTime.now.strftime('%Y-%m-%d-%H-%M-%S'))
+
 EXCLUDES = [
   SCRIPT_NAME,
   '.DS_Store',
@@ -63,6 +59,7 @@ EXCLUDES = [
   '.gitignore',
   '.gitmodules',
   'brew',
+  'sublime',
   'README.md',
   /.*~$/,
   /^\#.*\#$/,
@@ -113,10 +110,8 @@ module Keychain
         return two unless two.nil?
         return ""
       end
-      account = \
-        output[ACCOUNT_REGEXP].gsub!(ACCOUNT_REGEXP) { field_value[$1, $2] }
-      password = \
-        output[PASSWORD_REGEXP].gsub!(PASSWORD_REGEXP) { field_value[$1, $2] }
+      account = output[ACCOUNT_REGEXP].gsub!(ACCOUNT_REGEXP) { field_value[$1, $2] }
+      password = output[PASSWORD_REGEXP].gsub!(PASSWORD_REGEXP) { field_value[$1, $2] }
       @@cache[label] = Item.new(account, password)
     rescue NameError
       keychain_command = KEYCHAIN_GENERIC_PASSWORD_COMMAND
@@ -124,12 +119,10 @@ module Keychain
       if retry_times > 0
         retry
       else
-        raise KeychainError,
-          "Item '#{label}' could not be found in Keychain"
+        raise KeychainError, "Item '#{label}' could not be found in Keychain"
       end
     rescue IOError
-      raise KeychainError,
-        "Could not communicate with Keychain for item '#{label}'"
+      raise KeychainError, "Could not communicate with Keychain for item '#{label}'"
     end
   end
 end
@@ -168,55 +161,11 @@ def exists?(command)
   end
 end
 
-namespace :homebrew do
-  desc "Installs homebrew"
-  task :install => [:brew_install, :formula_install]
+namespace :dotfiles do
+  desc('Links dofiles')
+  task :link => [:link_dotfiles, :link_sublime]
 
-  desc "Updates package list and upgrades to latest version"
-  task :update => [:brew_update, :formula_install, :brew_upgrade]
-
-  task :brew_install do
-    if not exists? "brew"
-      info "Installing homebrew"
-      sh "ruby -e \"$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)\""
-      sh "brew doctor"
-    end
-  end
-  
-  task :brew_update => :brew_install do
-    sh "brew update"
-    sh "brew doctor"
-  end
-
-  task :brew_upgrade => :brew_update do
-    sh "brew upgrade"
-    sh "brew cleanup"
-  end
-
-  task :formula_install => :brew_update do
-    formula_list = []
-    FileList["brew/*"].each do |f|
-      file = File.new(f, "r")
-      while (line = file.gets)
-        # Don't installed commented or invalid lines
-        formula_list << line.chomp if not line =~ /^(#.*|\s*$)/
-      end
-    end
-
-
-    # Remove packages that are already installed
-    installables = formula_list - %x[brew list].split(/\s/)
-    installables.each do |formula|
-      sh "brew install #{formula}" do |ok, res|
-        # install, but don't die if brew throws an error
-      end
-    end
-  end
-end
-
-namespace :link do
-  desc 'Symlink dot files'
-  task :create do
+  task :link_dotfiles do
     Dir["#{CONFIG_DIR_PATH}/*"].each do |source|
       target_relative = source.gsub("#{CONFIG_DIR_PATH}/", '')
       target_backup = File.join(BACKUP_DIR_PATH, target_relative)
@@ -224,37 +173,125 @@ namespace :link do
       # Do not link if the source is a raw file, the target already exists and
       # is a symlink to the source.
       next if source =~ RAW_FILE_EXTENSION_REGEXP \
-        or excluded?(target_relative) \
-        or (File.exists?(target) \
-          and File.ftype(target) == 'link' \
-          and File.identical?(source, target))
-      info "Linking: #{target}"
-      begin
-        backup(target, target_backup)
-      rescue IOError
-        error "Could not backup '#{target}', will skip symlinking '#{source}'"
-        next
+      or excluded?(target_relative) \
+      or (File.exists?(target) \
+        and File.ftype(target) == 'link' \
+        and File.identical?(source, target))
+      link_and_backup(source, target, target_relative)
+    end
+  end
+
+  task :link_sublime do
+    Dir["#{SUBLIME_DIR_PATH}/*"].each do |source|
+      target_relative = source.gsub("#{SUBLIME_DIR_PATH}/", '')
+      tartget_backup = File.join(BACKUP_DIR_PATH, target_relative)
+      target = File.join(SUBLIME_PACKAGE_DIR, target_relative)
+
+      next if (File.exists?(target) \
+        and File.ftype(target) == 'link' \
+        and File.identical?(source, target))
+      link_and_backup(source, target, target_relative)
+    end
+  end
+
+  desc 'Render raw dot files'
+  task :render do
+    Dir["#{CONFIG_DIR_PATH}/**/*.#{RAW_FILE_EXTENSION}"].each do |source|
+      target = source.gsub(RAW_FILE_EXTENSION_REGEXP, '')
+      next if excluded? source
+      if File.file? source
+        begin
+          source_contents = File.read source
+          source_contents = ERB.new(source_contents).result(binding)
+        rescue IOError
+          error "Could not read raw file '#{source}'"
+        rescue NameError, SyntaxError => e
+          error "Could not render raw file '#{source}'.\n\n#{e.message}"
+        rescue KeychainError => e
+          error e.message
+        end
+        begin
+          target_contents = File.exists?(target) ? File.read(target) : nil
+          # Only overwrite the rendered dot file if the raw file has changed.
+          if source_contents != target_contents
+            File.open(target, 'w') do |file|
+              info "Writing: #{target}"
+              file.write source_contents
+              file.chmod 0600
+            end
+          end
+        rescue IOError
+          error "Could not write file '#{target}'"
+        end
       end
-      begin
-        File.symlink(source, target)
-      rescue IOError
-        error "Could not symlink '#{source}' to '#{target}'"
-      end
+    end
+  end
+
+  desc 'Uninstall dot files'
+  task :uninstall => 'dotfiles:clean' do
+    # unlink dotfiles from home directory
+    Dir["#{CONFIG_DIR_PATH}/*"].each do |source|
+      target_relative = source.gsub("#{CONFIG_DIR_PATH}/", '')
+      target = File.join(ENV['HOME'], ".#{target_relative}")
+      next if source =~ RAW_FILE_EXTENSION_REGEXP or excluded?(target_relative)
+      unlink(source, target)
+    end
+    # unlink sublime preferences
+    Dir["#{SUBLIME_PACKAGE_DIR}/*"].each do |source|
+      target = source.gsub("#{SUBLIME_DIR_PATH}/", '')
+      next if source =~ RAW_FILE_EXTENSION_REGEXP or excluded?(target)
+      unlink(source, target)
     end
   end
 
   desc 'Unlink broken symlinks'
   task :clean do
     Dir["#{ENV['HOME']}/.*"].each do |item|
-      if File.ftype(item) == 'link'
-        unless File.exists? item
-          info "Unlinking: #{item}"
-          begin
-            File.unlink item
-          rescue IOError
-            error "Could not unlink '#{item}'"
-          end
+      unlink_if_broken(item)
+    end
+    Dir["#{SUBLIME_PACKAGE_DIR}/*"].each do |item|
+      unlink_if_broken(item)
+    end
+  end
+
+  def link_and_backup(source, target, backup)
+    info "Linking: #{target}"
+    begin
+      backup(target, backup)
+    rescue IOError
+      error "Could not backup '#{target}', will skip symlinking '#{source}'"
+      next
+    end
+    begin
+      File.symlink(source, target)
+    rescue IOError
+      error "Could not symlink '#{source}' to '#{target}'"
+    end
+  end
+
+  def unlink_if_broken(file)
+    if File.ftype(file) == 'link'
+      unless File.exists? file
+        info "Unlinking: #{file}"
+        begin
+          File.unlink file
+        rescue IOError
+          error "Could not unlink '#{file}'"
         end
+      end
+    end
+  end
+
+  def unlink(source, target)
+    # Uninstall only if the target exists, is a symlink, and points to source.
+    if File.exists?(target) \
+      and File.ftype(target) == 'link' \
+      and File.identical?(source, target)
+      info "Unlinking: #{target}"
+      begin
+        File.unlink target
+      rescue IOError
+        error "Could not unlink '#{target}'"
       end
     end
   end
@@ -272,7 +309,7 @@ namespace :module do
       # Echo it onto the last line of stderr.
       Open3.popen3(
         "git submodule update --init --recursive; echo $? 1>&2"
-      ) do |stdin, stdout, stderr|
+        ) do |stdin, stdout, stderr|
         stdios = [stdin, stdout, stderr]
         threads = []
         threads << Thread.new do
@@ -303,6 +340,47 @@ namespace :module do
     end
   end
 
+  desc 'Make submodules'
+  task :make do
+    Dir["#{CONFIG_DIR_PATH}/**/Rakefile"].each do |rake_file|
+      next if SCRIPT_PATH.join('/') == rake_file
+      submodule = File.dirname rake_file
+      submodule_relative = submodule.gsub("#{CONFIG_DIR_PATH}/", '')
+      read, write = IO.pipe
+      pid = fork do
+        Dir.chdir submodule
+        Rake::Task.clear
+        load rake_file
+        next unless Rake::Task.task_defined?(:make)
+        info "Making: #{submodule_relative}"
+        # Redirect stdout, stderr since make is noisy.
+        stdout_old = STDOUT.clone
+        stderr_old = STDERR.clone
+        begin
+          STDOUT.reopen write
+          STDERR.reopen STDOUT
+          read.close
+          Rake::Task[:make].invoke
+        rescue Exception => e
+          STDOUT.reopen stdout_old
+          STDERR.reopen stderr_old
+          error e.message
+        end
+      end
+      begin
+        write.close
+        read.each do |line|
+          if read.eof? and line =~ /error:/i
+            error "Could not make '#{submodule_relative}'"
+          end
+        end
+      rescue IOError => e
+        error e.message
+      end
+      Process.waitpid pid
+    end
+  end
+
   desc 'Update submodules'
   task :update do
     if File.exists? '.gitmodules'
@@ -314,7 +392,7 @@ namespace :module do
       # Echo it onto the last line of stderr.
       Open3.popen3(
         "git submodule foreach git pull origin master; echo $? 1>&2"
-      ) do |stdin, stdout, stderr|
+        ) do |stdin, stdout, stderr|
         stdios = [stdin, stdout, stderr]
         threads = []
         threads << Thread.new do
@@ -346,95 +424,45 @@ namespace :module do
   end
 end
 
-desc 'Render raw dot files'
-task :render do
-  Dir["#{CONFIG_DIR_PATH}/**/*.#{RAW_FILE_EXTENSION}"].each do |source|
-    target = source.gsub(RAW_FILE_EXTENSION_REGEXP, '')
-    next if excluded? source
-    if File.file? source
-      begin
-        source_contents = File.read source
-        source_contents = ERB.new(source_contents).result(binding)
-      rescue IOError
-        error "Could not read raw file '#{source}'"
-      rescue NameError, SyntaxError => e
-        error "Could not render raw file '#{source}'.\n\n#{e.message}"
-      rescue KeychainError => e
-        error e.message
-      end
-      begin
-        target_contents = File.exists?(target) ? File.read(target) : nil
-        # Only overwrite the rendered dot file if the raw file has changed.
-        if source_contents != target_contents
-          File.open(target, 'w') do |file|
-            info "Writing: #{target}"
-            file.write source_contents
-	    file.chmod 0600
-          end
-        end
-      rescue IOError
-        error "Could not write file '#{target}'"
-      end
+namespace :homebrew do
+  desc "Installs homebrew"
+  task :install => [:brew_install, :formula_install]
+
+  desc "Updates package list and upgrades to latest version"
+  task :update => [:brew_update, :formula_install, :brew_upgrade]
+
+  task :brew_install do
+    if not exists? "brew"
+      info "Installing homebrew"
+      sh "ruby -e \"$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)\""
+      sh "brew doctor"
     end
   end
-end
 
-desc 'Make submodules'
-task :make do
-  Dir["#{CONFIG_DIR_PATH}/**/Rakefile"].each do |rake_file|
-    next if SCRIPT_PATH.join('/') == rake_file
-    submodule = File.dirname rake_file
-    submodule_relative = submodule.gsub("#{CONFIG_DIR_PATH}/", '')
-    read, write = IO.pipe
-    pid = fork do
-      Dir.chdir submodule
-      Rake::Task.clear
-      load rake_file
-      next unless Rake::Task.task_defined?(:make)
-      info "Making: #{submodule_relative}"
-      # Redirect stdout, stderr since make is noisy.
-      stdout_old = STDOUT.clone
-      stderr_old = STDERR.clone
-      begin
-        STDOUT.reopen write
-        STDERR.reopen STDOUT
-        read.close
-        Rake::Task[:make].invoke
-      rescue Exception => e
-        STDOUT.reopen stdout_old
-        STDERR.reopen stderr_old
-        error e.message
-      end
-    end
-    begin
-      write.close
-      read.each do |line|
-        if read.eof? and line =~ /error:/i
-          error "Could not make '#{submodule_relative}'"
-        end
-      end
-    rescue IOError => e
-      error e.message
-    end
-    Process.waitpid pid
+  task :brew_update => :brew_install do
+    sh "brew update"
+    sh "brew doctor"
   end
-end
 
-desc 'Uninstall dot files'
-task :uninstall => 'link:clean' do
-  Dir["#{CONFIG_DIR_PATH}/*"].each do |source|
-    target_relative = source.gsub("#{CONFIG_DIR_PATH}/", '')
-    target = File.join(ENV['HOME'], ".#{target_relative}")
-    next if source =~ RAW_FILE_EXTENSION_REGEXP or excluded?(target_relative)
-    # Uninstall only if the target exists, is a symlink, and points to source.
-    if File.exists?(target) \
-      and File.ftype(target) == 'link' \
-      and File.identical?(source, target)
-      info "Unlinking: #{target}"
-      begin
-        File.unlink target
-      rescue IOError
-        error "Could not unlink '#{target}'"
+  task :brew_upgrade => :brew_update do
+    sh "brew upgrade"
+    sh "brew cleanup"
+  end
+
+  task :formula_install => :brew_update do
+    formula_list = []
+    FileList["brew/*"].each do |f|
+      file = File.new(f, "r")
+      while (line = file.gets)
+        # Don't installed commented or invalid lines
+        formula_list << line.chomp if not line =~ /^(#.*|\s*$)/
+      end
+    end
+    # Remove packages that are already installed
+    installables = formula_list - %x[brew list].split(/\s/)
+    installables.each do |formula|
+      sh "brew install #{formula}" do |ok, res|
+        # install, but don't die if brew throws an error
       end
     end
   end
@@ -445,13 +473,12 @@ task :install => [
   'homebrew:install',
   'homebrew:update',
   'module:init',
-  'render',
-  'link:create',
-  'link:clean',
-  'make'
-] do
-  info "Backup: #{BACKUP_DIR_PATH}" if File.directory? BACKUP_DIR_PATH
-end
+  'dotfiles:render',
+  'dotfiles:link',
+  'dotfiles:clean',
+  'module:make'
+  ] do
+    info "Backup: #{BACKUP_DIR_PATH}" if File.directory? BACKUP_DIR_PATH
+  end
 
-task :default => [:install]
-
+  task :default => [:install]
