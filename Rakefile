@@ -45,7 +45,7 @@ SCRIPT_NAME = SCRIPT_PATH.last
 CONFIG_DIR_PATH = SCRIPT_PATH.first
 
 SUBLIME_DIR_PATH = "#{CONFIG_DIR_PATH}/sublime"
-SUBLIME_PACKAGE_DIR = "#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages/User"
+SUBLIME_PACKAGE_DIR = "#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages"
 
 BACKUP_DIR_PATH = File.join(
   ENV['HOME'],
@@ -185,7 +185,8 @@ namespace :dotfiles do
     Dir["#{SUBLIME_DIR_PATH}/*"].each do |source|
       target_relative = source.gsub("#{SUBLIME_DIR_PATH}/", '')
       tartget_backup = File.join(BACKUP_DIR_PATH, target_relative)
-      target = File.join(SUBLIME_PACKAGE_DIR, target_relative)
+      preference_type = target_relative =~ /.*\(.+\).+/ ? 'Default' : 'User'
+      target = File.join(SUBLIME_PACKAGE_DIR, preference_type, target_relative)
 
       next if (File.exists?(target) \
         and File.ftype(target) == 'link' \
@@ -263,6 +264,7 @@ namespace :dotfiles do
       next
     end
     begin
+      FileUtils.mkdir_p(File.dirname(target))
       File.symlink(source, target)
     rescue IOError
       error "Could not symlink '#{source}' to '#{target}'"
