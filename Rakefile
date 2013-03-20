@@ -27,10 +27,10 @@ def error(text)
 end
 
 # This Rakefile is written for Mac OS X system Ruby.
-if RUBY_VERSION >= '1.9'
-  error "Ruby 1.8.7 is required to run this Rakefile"
-  exit 1
-end
+# if RUBY_VERSION >= '1.9'
+#   error "Ruby 1.8.7 is required to run this Rakefile"
+#   exit 1
+# end
 
 RAW_FILE_EXTENSION = 'rrc'
 RAW_FILE_EXTENSION_REGEXP = /\.#{RAW_FILE_EXTENSION}$/
@@ -45,7 +45,6 @@ SCRIPT_NAME = SCRIPT_PATH.last
 CONFIG_DIR_PATH = SCRIPT_PATH.first
 
 SUBLIME_DIR_PATH = "#{CONFIG_DIR_PATH}/sublime"
-SUBLIME_PACKAGE_DIR = "#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages"
 
 BACKUP_DIR_PATH = File.join(
   ENV['HOME'],
@@ -186,7 +185,7 @@ namespace :dotfiles do
       target_relative = source.gsub("#{SUBLIME_DIR_PATH}/", '')
       tartget_backup = File.join(BACKUP_DIR_PATH, target_relative)
       preference_type = target_relative =~ /.*\(.+\).+/ ? 'Default' : 'User'
-      target = File.join(SUBLIME_PACKAGE_DIR, preference_type, target_relative)
+      target = File.join(sublime_preference_path, preference_type, target_relative)
 
       next if (File.exists?(target) \
         and File.ftype(target) == 'link' \
@@ -297,6 +296,17 @@ namespace :dotfiles do
       end
     end
   end
+
+  def sublime_preference_path
+  	if RUBY_PLATFORM.include? 'darwin'
+  		"#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages"
+  	elsif RUBY_PLATFORM.include? 'linux'
+  		"#{ENV['HOME']}/.Sublime Text 3"
+  	else
+  		 "#{ENV['APPDATA']}\\Sublime Text 2"
+  	end
+  end
+  		
 end
 
 namespace :module do
@@ -468,6 +478,10 @@ namespace :homebrew do
       end
     end
   end
+end
+
+task :test do
+	info RUBY_PLATFORM
 end
 
 desc 'Install dot files'
