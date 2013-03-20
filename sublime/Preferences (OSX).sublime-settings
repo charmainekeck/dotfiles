@@ -1,0 +1,34 @@
+// Place your settings in the file "User/Preferences.sublime-settings", which
+// overrides the settings in here.
+//
+// Settings may also be placed in file type specific options files, for
+// example, in Packages/Python/Python.sublime-settings for python files.
+{
+    // Note that the font_face and font_size are overriden in the platform
+    // specific settings file, for example, "Preferences (Linux).sublime-settings".
+    // Because of this, setting them here will have no effect: you must set them
+    // in your User File Preferences.
+    "font_face": "Anonymous Pro",
+    "font_size": 13,
+
+    // Set to false to disable scrolling past the end of the buffer.
+    // On OS X, this value is overridden in the platform specific settings, so
+    // you'll need to place this line in your user settings to override it.
+    "scroll_past_end": true,
+
+    // OS X only: Set to true to disable Lion style full screen support.
+    // Sublime Text must be restarted for this to take effect.
+    "use_simple_full_screen": false,
+
+    // OS X only. Valid values are true, false, and "auto". Auto will enable
+    // the setting when running on a screen 2560 pixels or wider (i.e., a
+    // Retina display). When this setting is enabled, OpenGL is used to
+    // accelerate drawing. Sublime Text must be restarted for changes to take
+    // effect.
+    "gpu_window_buffer": "auto",
+
+    // Show the full path to files in the title bar.
+    // On OS X, this value is overridden in the platform specific settings, so
+    // you'll need to place this line in your user settings to override it.
+    "show_full_path": false
+}
