@@ -186,7 +186,7 @@ namespace :dotfiles do
       tartget_backup = File.join(BACKUP_DIR_PATH, target_relative)
       preference_type = target_relative =~ /.*\(.+\).+/ ? 'Default' : 'User'
       target = File.join(sublime_package_path, preference_type, target_relative)
-info target
+
       next if (File.exists?(target) \
         and File.ftype(target) == 'link' \
         and File.identical?(source, target))
