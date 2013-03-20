@@ -27,10 +27,10 @@ def error(text)
 end
 
 # This Rakefile is written for Mac OS X system Ruby.
-# if RUBY_VERSION >= '1.9'
-#   error "Ruby 1.8.7 is required to run this Rakefile"
-#   exit 1
-# end
+if RUBY_VERSION >= '1.9'
+  error "Ruby 1.8.7 is required to run this Rakefile"
+  exit 1
+end
 
 RAW_FILE_EXTENSION = 'rrc'
 RAW_FILE_EXTENSION_REGEXP = /\.#{RAW_FILE_EXTENSION}$/
@@ -478,10 +478,6 @@ namespace :homebrew do
       end
     end
   end
-end
-
-task :test do
-	info RUBY_PLATFORM
 end
 
 desc 'Install dot files'
