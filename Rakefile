@@ -185,8 +185,8 @@ namespace :dotfiles do
       target_relative = source.gsub("#{SUBLIME_DIR_PATH}/", '')
       tartget_backup = File.join(BACKUP_DIR_PATH, target_relative)
       preference_type = target_relative =~ /.*\(.+\).+/ ? 'Default' : 'User'
-      target = File.join(sublime_preference_path, preference_type, target_relative)
-
+      target = File.join(sublime_package_path, preference_type, target_relative)
+info target
       next if (File.exists?(target) \
         and File.ftype(target) == 'link' \
         and File.identical?(source, target))
@@ -297,13 +297,13 @@ namespace :dotfiles do
     end
   end
 
-  def sublime_preference_path
+  def sublime_package_path
   	if RUBY_PLATFORM.include? 'darwin'
   		"#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages"
   	elsif RUBY_PLATFORM.include? 'linux'
-  		"#{ENV['HOME']}/.Sublime Text 3"
+  		"#{ENV['HOME']}/.Sublime Text 3/Packages"
   	else
-  		 "#{ENV['APPDATA']}\\Sublime Text 2"
+  		 "#{ENV['APPDATA']}\\Sublime Text 3/Packages"
   	end
   end
   		
