@@ -1,0 +1,16 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+#          FILE:  ssh-with-profile
+#   DESCRIPTION:  Changes the iTerm profile when ssh'ing
+#        AUTHOR:  Adam Walz <adamwalz@me.com>
+#       VERSION:  1.1.0
+#------------------------------------------------------------------------------
+
+DEF_PROFILE="Classic" # default profile name
+SSH_PROFILE="SSH" # profile name to use with ssh
+
+trap '{ echo -e "\033]50;SetProfile=$DEF_PROFILE\a" ; exit 1; }' INT
+
+echo -e "\033]50;SetProfile=$SSH_PROFILE\a"
+ssh $@
+echo -e "\033]50;SetProfile=$DEF_PROFILE\a"

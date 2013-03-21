@@ -1,0 +1,88 @@
+#!/bin/bash
+#-----------------------------------------------------------------------------
+#          FILE:  pandora
+#   DESCRIPTION:  Pianobar remote control using FIFO
+#        AUTHOR:  Adam Walz <viperlight89@me.com>
+#       VERSION:  1.0.0
+#-----------------------------------------------------------------------------
+
+ctl="$HOME/.config/pianobar/ctl"
+icon="icon.png"
+
+if ! which 'pgrep' > /dev/null; then
+	pgrep() {
+		result=$(ps -acxo pid,command | grep -i "$@" | awk '{ print $1 }')
+		if [[ -n "$result" ]]; then
+			echo "$result"
+			return 0
+		else
+			return 1
+		fi
+	}
+fi
+
+if ! which 'pianobar' > /dev/null; then
+	growlnotify --name "Pianobar" --image "$icon" --title "Pianobar"\
+		--message "Not installed"
+	exit 1
+fi
+
+if ! [ -p $ctl ]; then
+	growlnotify --name "Pianobar" --image "$icon" --title "FIFO does not exist"\
+		--message "Quit pianobar and run mkfifo $ctl"
+	exit 1
+fi
+
+if ! pgrep 'pianobar' > /dev/null; then
+	growlnotify --name "Pianobar" --image "$icon" --title "Pianobar"\
+		--message "Not nunning"
+	exit 1
+fi
+
+if [[ ! -p "$ctl" ]]; then
+	rm -f "$ctl"
+	mkfifo "$ctl"
+fi
+
+usage() {
+	echo "$(basename $0)"
+	echo "Usage:"
+	echo "  $0 [OPTION]"
+	echo "  -h, --help		Help"
+	echo "  play|pause|pp|p	Play / Pause"
+	echo "  next|n		Play Next"
+	echo "  love|+		Love Song"
+	echo "  ban|-			Ban Song"
+	echo "  tired|t		Tired of Song"
+	echo
+	echo "Current pianobar PIDs (euid=$(id -u)):"
+	pgrep -u $(id -u) pianobar$
+}
+
+case "$1" in
+	(play|pause|pp|p)
+		cmd='p'
+	;;
+	(next|n)
+		cmd='n'
+	;;
+	(love|\+)
+		cmd='+'
+	;;
+	(ban|\-)
+		cmd='-'
+	;;
+	(tired|t)
+		cmd='t'
+	;;
+	(--help|-h)
+		usage
+	;;
+	(*)
+		usage
+	;;
+esac
+
+/bin/echo -n "$cmd" > "$ctl"
+
+exit 0

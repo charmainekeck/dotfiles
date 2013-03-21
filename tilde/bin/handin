@@ -1,0 +1,48 @@
+#!/bin/sh
+#-----------------------------------------------------------------------------
+#          FILE:  handin
+#   DESCRIPTION:  Remote handin program to rcvhandin in UofU CADE Lab
+#        AUTHOR:  Daniel Blakemore
+#       VERSION:  1.0.0
+#
+# To make your life easier, add the following line to your .profile
+# alias handin='/path/to/./cadehandin.sh'
+# then it will behave basically like the handin utility on the lab machines.
+#
+# In order for this script to be speedy and sleek, set up public key authentication
+# so you can login to the cade lab without your password.
+#
+# Usage
+#   ./handin [class] [assignment] [file1] [file2] ...
+#-----------------------------------------------------------------------------
+
+# copy the files to the cade lab
+argno=0
+filelist=""
+for argument
+do
+    case $argno in
+        0 )
+        # class name
+        class=$1
+        ;;
+        1 )
+        # assignment name
+        assign=$2
+        ;;
+        * )
+        # files
+        echo "Uploading $argument to CADE lab..."
+        ssh -q cade "mkdir -p .handin/$class/$assign"
+        scp "$argument" cade:.handin/$class/$assign
+        echo "done."
+        filelist+=".handin/$class/$assign/"
+        filelist+=`basename "$argument"`
+        filelist+=" "
+        ;;
+    esac
+    ((argno++))
+done
+
+# handin command
+ssh cade "handin $class $assign $filelist"
