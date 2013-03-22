@@ -23,22 +23,29 @@ zstyle ':prezto:load' zfunction 'zargs' 'zmv'
 
 # Set the Prezto modules to load (browse modules).
 # The order matters.
+## environment must be loaded first
+## gnu-utility must be loaded before the utility module
+## completion must be loadad after the utility module
+## fasd must be loaded after the completion module
+## syntax-highlightin, history-substring-search, and prompt must be loaded
+##   last, in that order
+## Otherwise order is irrelevant
 zstyle ':prezto:load' pmodule \
   'environment' \
   'terminal' \
-  'editor' \
-  'history' \
-  'directory' \
-  'spectrum' \
   'gnu-utility' \
   'utility' \
   'completion' \
+  'fasd' \
+  'directory' \
+  'editor' \
   'git' \
+  'history' \
   'osx' \
   'python' \
   'ruby' \
+  'spectrum' \
   'tmux' \
-  'fasd' \
   'syntax-highlighting' \
   'history-substring-search' \
   'prompt'
