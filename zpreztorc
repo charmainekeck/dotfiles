@@ -34,14 +34,11 @@ zstyle ':prezto:load' pmodule \
   'utility' \
   'completion' \
   'git' \
-  'archive' \
   'osx' \
-  'perl' \
   'python' \
   'ruby' \
   'tmux' \
   'fasd' \
-  'node' \
   'syntax-highlighting' \
   'history-substring-search' \
   'prompt'
