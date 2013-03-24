@@ -73,6 +73,7 @@ EXCLUDES = [
   '.gitmodules',
   'brew',
   'sublime',
+  'pythons' ,
   'README.md',
   /.*~$/,
   /^\#.*\#$/,
@@ -496,10 +497,74 @@ namespace :homebrew do
   end
 end
 
+namespace :python do
+  desc "Installs pythonz"
+  task :install => [:pip_install, :pythonz_install]
+
+  desc "Updates pythonz and installs python versions"
+  task :update => [:pythonz_update, :pythons_install]
+
+  task :pythonz_install do
+    if not exists? "pythonz"
+      info "Installing pythonz"
+      sh "curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash"
+    end
+  end
+
+  task :pythonz_update => :pythonz_install do
+    sh "pythonz update"
+  end
+
+  task :pythons_install => :pythonz_update do
+    pythons_list = []
+    file = File.open(File.join("#{CONFIG_DIR_PATH}", "pythons"), 'r')
+    while (line = file.gets)
+      # Don't install commented out python versions
+      pythons_list << line.chomp if not line =~ /^(#.*|\s*$)/
+    end
+    installables = pythons_list - %x[pythonz list].gsub(/CPython-/, '').split()
+    installables.each do |py|
+      sh "pythonz install #{py}" do |ok, res|
+        # install, but don't die if brew throws an error
+      end
+    end
+  end
+
+  task :pip_install do
+    if not exists? 'pip'
+      begin
+        # install distribute
+        sh "cd #{ENV['TMPDIR']} \
+          && curl -O http://python-distribute.org/distribute_setup.py"
+        sh "cd #{ENV['TMPDIR']} && python distribute_setup.py"
+        #install pip
+        sh "cd #{ENV['TMPDIR']} \
+          && curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py"
+        sh "cd #{ENV['TMPDIR']} && sudo python /tmp/get-pip.py"
+      rescue
+        error "Installing pip requires sudo"
+        error "Run sudo rake install"
+      end
+    end
+  end
+
+  task :virtualenv_install => :pip_install do
+    installables = ['virtualenv', 'virtualenvwrapper'] - %x[pip list].split()
+    installables.each do |v|
+      begin
+        sh "sudo pip install #{v}"
+      rescue
+        error "Pip Installing virtualenv requires sudo"
+        error "Run sudo rake install"
+      end
+    end
+  end
+end
+
 desc 'Install dot files'
 task :install => [
-  'homebrew:install',
   'homebrew:update',
+  'python:update' ,
   'module:init',
   'dotfiles:render',
   'dotfiles:link',
