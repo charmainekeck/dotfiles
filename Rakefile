@@ -251,7 +251,7 @@ namespace :dotfiles do
       unlink(source, target)
     end
     # unlink sublime preferences
-    Dir["#{SUBLIME_PACKAGE_DIR}/*"].each do |source|
+    Dir["#{sublime_package_path}/*"].each do |source|
       target = source.gsub("#{SUBLIME_DIR_PATH}/", '')
       next if source =~ RAW_FILE_EXTENSION_REGEXP or excluded?(target)
       unlink(source, target)
@@ -263,7 +263,7 @@ namespace :dotfiles do
     Dir["#{ENV['HOME']}/.*"].each do |item|
       unlink_if_broken(item)
     end
-    Dir["#{SUBLIME_PACKAGE_DIR}/*"].each do |item|
+    Dir["#{sublime_package_path}/*"].each do |item|
       unlink_if_broken(item)
     end
   end
