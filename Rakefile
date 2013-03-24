@@ -26,6 +26,20 @@ def error(text)
   STDERR.puts "Error: #{text}"
 end
 
+class Platform
+  def self.mac?
+    RUBY_PLATFORM.include? 'darwin'
+  end
+
+  def self.linux?
+    RUBY_PLATFORM.include? 'linux'
+  end
+
+  def self.windows?
+  RUBY_PLATFORM.include? 'windows'
+  end
+end
+
 # This Rakefile is written for Mac OS X system Ruby.
 if RUBY_VERSION >= '1.9'
   error "Ruby 1.8.7 is required to run this Rakefile"
@@ -298,15 +312,14 @@ namespace :dotfiles do
   end
 
   def sublime_package_path
-  	if RUBY_PLATFORM.include? 'darwin'
-  		"#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages"
-  	elsif RUBY_PLATFORM.include? 'linux'
-  		"#{ENV['HOME']}/.Sublime Text 3/Packages"
-  	else
-  		 "#{ENV['APPDATA']}\\Sublime Text 3/Packages"
-  	end
+    if Platform.mac?
+      "#{ENV['HOME']}/Library/Application Support/Sublime Text 3/Packages"
+    elsif Platform.linux?
+      "#{ENV['HOME']}/.Sublime Text 3/Packages"
+    else
+      "#{ENV['APPDATA']}\\Sublime Text 3/Packages"
+    end
   end
-  		
 end
 
 namespace :module do
@@ -444,7 +457,7 @@ namespace :homebrew do
   task :update => [:brew_update, :formula_install, :brew_upgrade]
 
   task :brew_install do
-    if not exists? "brew"
+    if Platform.mac? and not exists? "brew"
       info "Installing homebrew"
       sh "ruby -e \"$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)\""
       sh "brew doctor"
@@ -452,16 +465,19 @@ namespace :homebrew do
   end
 
   task :brew_update => :brew_install do
+    next if not Platform.mac?
     sh "brew update"
     sh "brew doctor"
   end
 
   task :brew_upgrade => :brew_update do
+    next if not Platform.mac?
     sh "brew upgrade"
     sh "brew cleanup"
   end
 
   task :formula_install => :brew_update do
+  	next if not Platform.mac?
     formula_list = []
     FileList["brew/*"].each do |f|
       file = File.new(f, "r")
