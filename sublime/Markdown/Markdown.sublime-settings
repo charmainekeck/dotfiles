@@ -1,0 +1,4 @@
+{
+	// Automatic hard wrap when the cursor is beyond the ruler (defualt 80)
+	"auto_wrap" : true
+}

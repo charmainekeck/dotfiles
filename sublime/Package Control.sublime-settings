@@ -2,6 +2,7 @@
 	"auto_upgrade_last_run": 1353518956,
 	"installed_packages":
 	[
+		"AutoWrap",
 		"GitGutter",
 		"Package Control",
 		"SublimeLinter",
