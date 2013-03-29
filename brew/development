@@ -1,6 +1,9 @@
 #apple-gcc42
 heroku-toolbelt
 hub
+# Google Cloud
+gcutil
+gsutil
 plt-racket
 r
 rbenv
