@@ -2,10 +2,19 @@
 	"auto_upgrade_last_run": 1353518956,
 	"installed_packages":
 	[
+		"AdvancedNewFile",
 		"AutoWrap",
+		"Emmet",
+		"Git",
 		"GitGutter",
+		"MarkAndMove",
 		"Package Control",
+		"Pretty JSON",
+		"SideBarEnhancements",
+		"SideBarGit",
+		"SublimeCodeIntel",
 		"SublimeLinter",
+		"SublimeREPL",
 		"Theme - Soda"
 	]
 }
