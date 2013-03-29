@@ -12,6 +12,23 @@ require 'rubygems'
 require 'rake'
 require 'erb'
 
+# Do stuff in parallel
+module Enumerable
+  def in_parallel
+    map{|x| Thread.new do
+        Thread.current.abort_on_exception = true
+        yield(x)
+      end
+    }.each do |t|
+      begin
+        t.join
+      rescue Exception => e
+        error e.message if e.class == IOError
+      end
+    end
+  end
+end
+
 # Raised when a Keychain item is not found.
 class KeychainError < Exception
 end
@@ -489,7 +506,7 @@ namespace :homebrew do
     end
     # Remove packages that are already installed
     installables = formula_list - %x[brew list].split(/\s/)
-    installables.each do |formula|
+    installables.in_parallel do |formula|
       sh "brew install #{formula}" do |ok, res|
         # install, but don't die if brew throws an error
       end
@@ -499,7 +516,7 @@ end
 
 namespace :python do
   desc "Installs pythonz"
-  task :install => [:pip_install, :pythonz_install]
+  multitask :install => [:pip_install, :pythonz_install]
 
   desc "Updates pythonz and installs python versions"
   task :update => [:pythonz_update, :pythons_install]
@@ -563,8 +580,7 @@ end
 
 desc 'Install dot files'
 task :install => [
-  'homebrew:update',
-  'python:update' ,
+  'install_tools',
   'module:init',
   'dotfiles:render',
   'dotfiles:link',
@@ -574,4 +590,12 @@ task :install => [
     info "Backup: #{BACKUP_DIR_PATH}" if File.directory? BACKUP_DIR_PATH
   end
 
-  task :default => [:install]
+desc 'Install tools and languages'
+multitask :install_tools => [
+  'homebrew:update',
+  'python:update'
+] do
+  info "Backup: #{BACKUP_DIR_PATH}" if File.directory? BACKUP_DIR_PATH
+end
+
+task :default => [:install]
