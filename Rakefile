@@ -75,8 +75,8 @@ SCRIPT_PATH = File.split(File.expand_path(__FILE__))
 SCRIPT_NAME = SCRIPT_PATH.last
 CONFIG_DIR_PATH = SCRIPT_PATH.first
 
-SUBLIME_DIR_PATH = "#{CONFIG_DIR_PATH}/sublime"
-TILDE_DIR_PATH = "#{CONFIG_DIR_PATH}/tilde"
+SUBLIME_DIR_PATH = File.join("#{CONFIG_DIR_PATH}", 'sublime')
+TILDE_DIR_PATH = File.join("#{CONFIG_DIR_PATH}", 'tilde')
 
 BACKUP_DIR_PATH = File.join(
   ENV['HOME'],
