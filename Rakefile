@@ -520,7 +520,7 @@ namespace :python do
   multitask :install => [:virtualenv_install, :pythonz_install]
 
   desc "Updates pythonz and installs python versions"
-  task :update => [:pythonz_update, :pythons_install]
+  task :update => [:install, :pythonz_update, :pythons_install]
 
   task :pythonz_install do
     if not exists? "pythonz"
@@ -579,10 +579,11 @@ namespace :python do
   end
 
   task :superpack_script do
-    next if not Platform.mac?
-    sh "cd #{TILDE_DIR_PATH}/bin \
-      && curl -o install_superpack.sh \
-      https://raw.github.com/fonnesbeck/ScipySuperpack/master/install_superpack.sh"
+    f = File.join("#{TILDE_DIR_PATH}", 'bin', 'install_superpack.sh')
+    if Platform.mac? and not File.exists? f
+      sh "curl -o #{f} \
+        https://raw.github.com/fonnesbeck/ScipySuperpack/master/install_superpack.sh"
+    end
   end
 end
 
