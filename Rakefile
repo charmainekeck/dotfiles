@@ -516,11 +516,8 @@ namespace :homebrew do
 end
 
 namespace :python do
-  desc "Installs pythonz"
-  multitask :install => [:virtualenv_install, :pythonz_install]
-
   desc "Updates pythonz and installs python versions"
-  task :update => [:install, :pythonz_update, :pythons_install]
+  task :update => [:pythons_install, :virtualenv_install]
 
   task :pythonz_install do
     if not exists? "pythonz"
@@ -566,7 +563,7 @@ namespace :python do
     end
   end
 
-  multitask :virtualenv_install => [:pip_install, :superpack_script] do
+  task :virtualenv_install => [:pip_install, :superpack_script] do
     installables = ['virtualenv', 'virtualenvwrapper'] - %x[pip list].split()
     installables.each do |v|
       begin
