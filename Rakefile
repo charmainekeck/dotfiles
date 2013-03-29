@@ -76,6 +76,7 @@ SCRIPT_NAME = SCRIPT_PATH.last
 CONFIG_DIR_PATH = SCRIPT_PATH.first
 
 SUBLIME_DIR_PATH = "#{CONFIG_DIR_PATH}/sublime"
+TILDE_DIR_PATH = "#{CONFIG_DIR_PATH}/tilde"
 
 BACKUP_DIR_PATH = File.join(
   ENV['HOME'],
@@ -516,7 +517,7 @@ end
 
 namespace :python do
   desc "Installs pythonz"
-  multitask :install => [:pip_install, :pythonz_install]
+  multitask :install => [:virtualenv_install, :pythonz_install]
 
   desc "Updates pythonz and installs python versions"
   task :update => [:pythonz_update, :pythons_install]
@@ -565,7 +566,7 @@ namespace :python do
     end
   end
 
-  task :virtualenv_install => :pip_install do
+  multitask :virtualenv_install => [:pip_install, :superpack_script] do
     installables = ['virtualenv', 'virtualenvwrapper'] - %x[pip list].split()
     installables.each do |v|
       begin
@@ -575,6 +576,13 @@ namespace :python do
         error "Run sudo rake install"
       end
     end
+  end
+
+  task :superpack_script do
+    next if not Platform.mac?
+    sh "cd #{TILDE_DIR_PATH}/bin \
+      && curl -o install_superpack.sh \
+      https://raw.github.com/fonnesbeck/ScipySuperpack/master/install_superpack.sh"
   end
 end
 
