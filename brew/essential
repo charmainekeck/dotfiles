@@ -2,5 +2,6 @@ ack
 coreutils
 fasd
 gfortran
+mobile-shell
 trash
 tmux
