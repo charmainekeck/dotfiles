@@ -3,6 +3,7 @@ heroku-toolbelt
 hub
 plt-racket
 r
+rbenv
 readline
 reattach-to-user-namespace
 zeromq
