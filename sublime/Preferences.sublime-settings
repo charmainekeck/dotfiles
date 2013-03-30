@@ -63,6 +63,11 @@
   
   // The theme controls the look of Sublime Text's UI (buttons, tabs, scroll bars, etc)
   "theme": "Default.sublime-theme",
+
+  // Set to true to close windows as soon as the last file is closed, unless
+  // there's a folder open within the window. This is always enabled on OS X,
+  // changing it here won't modify the behavior.
+  "close_windows_when_empty": true,
   
   // folder_exclude_patterns and file_exclude_patterns control which files
   // are listed in folders on the side bar. These can also be set on a per-
