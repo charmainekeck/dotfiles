@@ -326,7 +326,18 @@ namespace :dotfiles do
 
   task :link_dotfiles do
     Dir["#{CONFIG_DIR_PATH}/*"].each do |source|
+      next if ((source =~ /#{CONFIG_DIR_PATH}\/mac-.+/ and not Platform.mac?) \
+            or (source =~ /#{CONFIG_DIR_PATH}\/linux-.+/ and not Platform.linux?) \
+            or (source =~ /#{CONFIG_DIR_PATH}\/windows-.+/ and not Platform.windows?))
+
       target_relative = source.gsub("#{CONFIG_DIR_PATH}/", '')
+      if source =~ /#{CONFIG_DIR_PATH}\/mac-.+/
+        target_relative.gsub!('mac-', '')
+      elsif source =~ /#{CONFIG_DIR_PATH}\/linux-.+/
+        target_relative.gsub!('linux-', '')
+      elsif source =~ /#{CONFIG_DIR_PATH}\/windows-.+/
+        target_relative.gsub!('windows-', '')
+      end
       target_backup = File.join(BACKUP_DIR_PATH, target_relative)
       target = File.join(ENV['HOME'], ".#{target_relative}")
       # Do not link if the source is a raw file, the target already exists and
