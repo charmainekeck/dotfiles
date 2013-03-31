@@ -1,11 +1,136 @@
-# OS X
+#------------------------------------------------------------------------------
+#          FILE:  mac-gitignore
+#   DESCRIPTION:  Global gitignore file for OS X systems
+#        AUTHOR:  Adam Walz <viperlight89@me.com>
+#       VERSION:  1.0.0
+#
+# Make sure to edit linux-gitignore and windows-gitignore if the settings
+# changed are cross-platform
+#------------------------------------------------------------------------------
+
+#################### OS X ####################
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon
+profile
+
+# Thumbnails
+._*
+
+# OS X Files that might appear on external disk
 .Spotlight-V100
 .Trashes
-Icon
 
-# Xcode
+#################### Eclipse ####################
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# PDT-specific
+.buildpath
+
+#################### Emacs ####################
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+.\#*
+
+# Org-mode
+.org-id-locations
+*_archive
+
+#################### Matlab ####################
+# autosave extension
+*.m~
+
+# Compiled MEX binaries (all platforms)
+*.mex*
+
+# Simulink Code Generation  
+slprj/
+
+#################### Mercurial ####################
+/.hg/*
+*/.hg/*
+.hgignore
+
+#################### Mono Develop ####################
+#User Specific
+*.userprefs
+*.usertasks
+
+#Mono Project Files
+*.pidb
+*.resources
+test-results/
+
+#################### Netbeans ####################
+nbproject/private/
 build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+#################### SVN ####################
+.svn/
+
+#################### Sublime Text ####################
+# SublimeText project files
+*.sublime-workspace
+
+#################### Text Mate ####################
+*.tmproj
+*.tmproject
+tmtags
+
+#################### VirtualEnv ####################
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ss]cripts
+
+#################### Vim ####################
+.*.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+#################### Xcode ####################
+*~.nib
+DerivedData/
+build/
+.idea/
+
+# Private settings
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -14,17 +139,16 @@ build/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
+
+# Semi-private data
+xcuserdata
+
+# Workspaces are also personal
 *.xcworkspace
 !default.xcworkspace
-xcuserdata
-profile
+
+# Deprecated classes
 *.moved-aside
-DerivedData
-.idea/
 
-# Emacs
-~$
-
-# Sublime Text
-*.sublime-workspace
-*.sublime-project
+# Cocoapods
+Pods/
